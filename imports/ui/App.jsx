@@ -23,6 +23,9 @@ export default class App extends Component {
       <div className="container">
         <header>
           <h1>Todo List</h1>
+          <form>
+            
+          </form>
         </header>
  
         <ul>
