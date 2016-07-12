@@ -23,17 +23,39 @@ Meteor.methods({
 	},
 	'tasks.remove'(taskId){
 		check(taskId,String);
+		const task=Tasks.findOne(taskId);
+		if(task.private&&task.owner!==this.userId){
+			throw new Meteor.Error('not-anthorized');
+		}
 		Tasks.remove(taskId);
 	},
 	'tasks.setChecked'(taskId,setChecked){
 		check(taskId,String);
 		check(setChecked,Boolean);
-		tasks.update(taskId,{$set:{check:setChecked}});
+		const task=Tasks.findOne(taskId);
+		if(task.private&&task.owner!==this.userId){
+			throw new Meteor.Error('not-anthorized');
+		}
+		Tasks.update(taskId,{$set:{checked:setChecked}});
+	},
+	'tasks.setPrivate'(taskId,setToPrivate){
+		check(taskId,String);
+		check(setToPrivate,Boolean);
+		const task=Tasks.findOne(taskId);
+		if(task.owner!==this.userId){
+			throw new Meteor.Error('not-anthorized');
+		}
+		Tasks.update(taskId,{$set:{private:setToPrivate}});
 	},
 });
 
 if(Meteor.isServer){
 	Meteor.publish('tasks',function tasksPublication(){
-		return Tasks.find();
+		return Tasks.find({
+			$or:[
+				{private:{$ne:true}},
+				{owner:this.userId},
+			]
+		});
 	})
 }

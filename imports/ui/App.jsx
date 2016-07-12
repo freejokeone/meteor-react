@@ -50,7 +50,13 @@ class App extends Component {
    if(this.state.hideCompleted){
     fillteredTasks=fillteredTasks.filter(task=>!task.checked);
    }
-   return fillteredTasks.map((task)=>(<Task key={task._id} task={task} />))
+   return fillteredTasks.map((task)=>{
+    const currentUserId=this.props.currentUser&&this.props.currentUser._id;
+    const showPrivateButton=task.owner===currentUserId;
+    return (
+       <Task key={task._id} task={task} showPrivateButton={showPrivateButton}/>
+      );
+   });
   };
 
   render() {
@@ -81,8 +87,7 @@ class App extends Component {
 
 App.propTypes={
   tasks:PropTypes.array.isRequired,
-  incompleteCount:PropTypes.number.isRequired,
-  currentUser:PropTypes.object,
+  showPrivateButton:React.PropTypes.bool.isRequired,
 };
 
 export default createContainer(()=>{
